@@ -10,53 +10,54 @@ This is the function you need to implement. Quick reference:
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include <vector>
+
+//Using https://en.wikipedia.org/wiki/Pearson_correlation_coefficient
 
 void correlate(int ny, int nx, const float *data, float *result) {
-    std::vector<double> tempmatrix(nx * ny);
-    double avg,sumofsquares ; 
-    
-    for(int row = 0; row < ny; row++){
-        avg = 0;
-        sumofsquares = 0;
-        for(int col = 0; col < nx; col++){
-            avg = avg + double(data[col + row*nx]);
-        }
-        avg = avg/nx;
+    double avgi = 0;
+    double avgj = 0;
+    double rij = 0;
+    double ri = 0;
+    double rj= 0;
 
-        for(int col = 0; col < nx; col++){
-            tempmatrix[col + row*nx] = data[col + row*nx]-avg;
-            sumofsquares = sumofsquares +double(tempmatrix[col + row*nx]*tempmatrix[col + row*nx]);
-        }
+    for(int j = 0; j <= ny ; j++){
         
-        //normalize the input rows so that each row has the arithmetic mean of 0
-        for(int col = 0; col < nx; col++){
-            tempmatrix[col + row*nx] = tempmatrix[col + row*nx]/sqrt(sumofsquares);
-        }
-        
+        for(int i = 0; i < ny ; i++){
+            
+            if (i >= j ){
+                //for both i and j  row first compute avg
+                avgi = 0;
+                avgj = 0;
+                ri = 0;
+                rj= 0;
+                rij= 0;
 
-    }
-    double x; 
-    for(int row = 0; row < ny; row++){
-        for(int col = 0; col < ny; col++){
-            if(row <= col){
-                x= 0;
-                for(int k = 0; k < nx; k++){
-                    //printf("row = %d, col = %d,k = %d\n ",row, col,k);
-                    x =x +tempmatrix[k + row*nx]*tempmatrix[k + col*nx]; 
-                    
-                result[col + row*ny] = float(x); 
+                for (int col =0; col < nx; col++ ){
+                    //printf("%f\n",data[col + i*nx]);
+                    avgi = avgi + data[col + i*nx];
+                    avgj = avgj + data[col + j*nx];
                 }
+                avgi = avgi/nx;
+                avgj = avgj/nx;
+                
+               
+                //compute the pearson correlation coefficient 
+                for(int col =0; col < nx; col++ ){
+                    rij = rij + ((data[col + i*nx]-avgi)*(data[col + j*nx]-avgj));
+                    ri = ri + ((data[col + i*nx]-avgi)*(data[col + i*nx]-avgi));
+                    rj = rj + ((data[col + j*nx]-avgj)*(data[col + j*nx]-avgj));
+                    
+
+                }
+                 
+                result[i + j*ny] = float(rij/(sqrt(ri)*sqrt(rj)));
             }
         }
-    }
-    
-   //free(tempmatrix);
-
+        
 }
 
 
 
 
 
-
+}
