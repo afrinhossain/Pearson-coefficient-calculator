@@ -10,54 +10,107 @@ This is the function you need to implement. Quick reference:
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-
-//Using https://en.wikipedia.org/wiki/Pearson_correlation_coefficient
+#include <vector>
+#include <iostream>
 
 void correlate(int ny, int nx, const float *data, float *result) {
-    double avgi = 0;
-    double avgj = 0;
-    double rij = 0;
-    double ri = 0;
-    double rj= 0;
+    int m0= 4;
+    int extra = m0 - nx % m0;
+    double innersum;
+    double x[m0];
+    double outersum; 
+    int new_nx = new_nx;
+    int chunks = new_nx / m0;
+    std::vector<double> tempmatrix((new_nx)*ny );
 
-    for(int j = 0; j <= ny ; j++){
-        
-        for(int i = 0; i < ny ; i++){
-            
-            if (i >= j ){
-                //for both i and j  row first compute avg
-                avgi = 0;
-                avgj = 0;
-                ri = 0;
-                rj= 0;
-                rij= 0;
+    double avg,sumofsquares; 
+    for(int row = 0; row < ny; row++){
+        avg = 0;
+        sumofsquares = 0;
+        for(int col = 0; col < nx; col++){
+            avg = avg + (data[col + row*nx]);
+        }
+        avg = avg/nx;
 
-                for (int col =0; col < nx; col++ ){
-                    //printf("%f\n",data[col + i*nx]);
-                    avgi = avgi + data[col + i*nx];
-                    avgj = avgj + data[col + j*nx];
-                }
-                avgi = avgi/nx;
-                avgj = avgj/nx;
-                
-               
-                //compute the pearson correlation coefficient 
-                for(int col =0; col < nx; col++ ){
-                    rij = rij + ((data[col + i*nx]-avgi)*(data[col + j*nx]-avgj));
-                    ri = ri + ((data[col + i*nx]-avgi)*(data[col + i*nx]-avgi));
-                    rj = rj + ((data[col + j*nx]-avgj)*(data[col + j*nx]-avgj));
-                    
-
-                }
-                 
-                result[i + j*ny] = float(rij/(sqrt(ri)*sqrt(rj)));
-            }
+        for(int col = 0; col < nx; col++){
+            tempmatrix[col + row*(new_nx)] = data[col + row*nx]-avg;
+            sumofsquares += tempmatrix[col + row*(new_nx)]*tempmatrix[col + row*(new_nx)];
         }
         
+        //normalize the input rows so that each row has the arithmetic mean of 0
+        for(int col = 0; col < nx; col++){
+            tempmatrix[col + row*(new_nx)] = tempmatrix[col + row*(new_nx)]/sqrt(sumofsquares);
+            
+        }
+        
+        if( extra != 0){
+            for(int m = 0; m < extra; m++ ){
+                
+                tempmatrix[nx + m + row*(new_nx)] = 0;
+            }
+            
+        }
+
+        
+
+    }
+    
+    for(int row = 0; row < ny; row++){
+        for(int col = 0; col <= row ; col++){
+            outersum = 0;
+            for(int j = 0; j < chunks; j++){
+                innersum = 0; 
+                for(int m = 0; m < m0; m++){
+                    x[m] = tempmatrix[j*m0 + m + row*new_nx] * tempmatrix[j*m0 + m + col*new_nx];
+                }
+                
+                for(int m = 0; m < m0; m++){
+                    innersum += x[m];
+                }
+                outersum += innersum;
+            }
+            
+            result[row + col*ny] = outersum;
+        }
+
+    }
+    
+    
+   
+
 }
+           
 
+            /*
+            for(int m = 0; m < m0; m++){
+               if(row <= col + m){
+                    for(int k = 0; k < nx; k++){    
+                        //x =x +tempmatrix[k + row*nx]*tempmatrix[k + col*nx];
+                        x[m] = x[m] + tempmatrix[k + row*nx] * tempmatrix[k + (col+m)*nx]; 
+                        //printf("x[%d] = %f\n",m,x[m] );
+                    }
+                }
+            }
+        
+            
+            for(int m = 0; m < m0; m++){
+                result[col+m + row*ny] = float(x[m]);
+            }
+            
+               
+        }
+        
+        if(extra != 0){
+            double x;
+            for(int col = m0*(ny/m0); col < m0*(ny/m0)+ extra; col++){
+                x = 0;
+                for(int k = 0; k < nx; k++){    
+                        //x =x +tempmatrix[k + row*nx]*tempmatrix[k + col*nx];
+                        x =x + tempmatrix[k + row*nx] * tempmatrix[k + col*nx]; 
+                }
+                result[col+ row*ny] = float(x);
+            }
 
-
-
-
-}
+        }
+        */
+        
