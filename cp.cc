@@ -79,38 +79,5 @@ void correlate(int ny, int nx, const float *data, float *result) {
    
 
 }
-           
-
-            /*
-            for(int m = 0; m < m0; m++){
-               if(row <= col + m){
-                    for(int k = 0; k < nx; k++){    
-                        //x =x +tempmatrix[k + row*nx]*tempmatrix[k + col*nx];
-                        x[m] = x[m] + tempmatrix[k + row*nx] * tempmatrix[k + (col+m)*nx]; 
-                        //printf("x[%d] = %f\n",m,x[m] );
-                    }
-                }
-            }
-        
-            
-            for(int m = 0; m < m0; m++){
-                result[col+m + row*ny] = float(x[m]);
-            }
-            
-               
-        }
-        
-        if(extra != 0){
-            double x;
-            for(int col = m0*(ny/m0); col < m0*(ny/m0)+ extra; col++){
-                x = 0;
-                for(int k = 0; k < nx; k++){    
-                        //x =x +tempmatrix[k + row*nx]*tempmatrix[k + col*nx];
-                        x =x + tempmatrix[k + row*nx] * tempmatrix[k + col*nx]; 
-                }
-                result[col+ row*ny] = float(x);
-            }
-
-        }
-        */
+          
         
